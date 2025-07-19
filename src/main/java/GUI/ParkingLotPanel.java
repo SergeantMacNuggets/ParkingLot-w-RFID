@@ -22,7 +22,8 @@ public class ParkingLotPanel extends JPanel {
             this.setLayout(new GridLayout(y, x, 5, 5));
             for (int i = 0; i < y; i++) {
                 for (int j = 0; j < x; j++) {
-                    Lot lot = new Lot(j,i);
+                    parkingLot.addLot(new Lot(j,i),j, i);
+                    Lot lot = parkingLot.getLot(j,i);
                     lot.addMouseListener(mouseListener());
                     this.add(lot);
                 }
@@ -44,9 +45,9 @@ public class ParkingLotPanel extends JPanel {
                             if (instance.getRadioButtons()[i].isSelected()) {
                                 try {
                                     panel.removeAll();
-                                    lotState(i, panel);
                                     panel.revalidate();
                                     panel.repaint();
+                                    lotState(i, panel);
                                 } catch (Exception x) {
                                     break;
                                 }

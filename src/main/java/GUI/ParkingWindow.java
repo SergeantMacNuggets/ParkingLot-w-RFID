@@ -1,11 +1,14 @@
 package GUI;
 
 
+import BackEnd.Car;
+import BackEnd.ObjectSerialize;
 import BackEnd.ParkingLot;
 import net.miginfocom.swing.MigLayout;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -97,6 +100,16 @@ public class ParkingWindow extends JFrame {
         openButton = new JButton("Open"){{this.setPreferredSize(new Dimension(150,50));
                                          this.setBackground(LocalColor.buttonColor);
                                          this.setFont(new Font("Ariel", Font.BOLD,24));}};
+        openButton.addActionListener(e->{
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Save Parking Lot","txt");
+            chooser.setFileFilter(filter);
+            int returnVal = chooser.showOpenDialog(this);
+            if(returnVal == JFileChooser.APPROVE_OPTION) {
+                parkingLot = ObjectSerialize.serializeDataIn(chooser.getSelectedFile().getName());
+                this.updateParkingLot(parkingLot);
+            }
+        });
         newButton.addActionListener(createParkingLot());
         right.setBorder(BorderFactory.createEmptyBorder(20,0,20,40));
         p.setPreferredSize(new Dimension(0, 100));
@@ -125,7 +138,8 @@ public class ParkingWindow extends JFrame {
             rfidInput.setPreferredSize(new Dimension(0, 40));
             RFIDRegisterInput.setPreferredSize(new Dimension(0,40));
             rfidInput.addActionListener(e->{
-                        System.out.println(rfidInput.getText());
+                        parkingLot.parkCar(new Car(rfidInput.getText()), 5,5);
+                        parkingLot.getLot(5,5).setBackground(Color.green);
                         rfidInput.setText("");
                     }
             );
@@ -224,7 +238,13 @@ public class ParkingWindow extends JFrame {
         bottom.add(editRoad, "wrap 40");
         bottom.add(editEnter, "wrap 40");
         bottom.add(editExit, "wrap 40");
-        bottom.add(new JButton("Save"), "width 100%");
+        bottom.add(new JButton("Save") {{this.addActionListener(e->{
+            try {
+                ObjectSerialize.serializeDataOut(parkingLot, lotNameLabel.getText());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });}}, "width 100%");
         p.setLayout(new GridLayout(2,1));
         p.setBackground(new Color(61,62,71));
         p.setPreferredSize(new Dimension(200,0));

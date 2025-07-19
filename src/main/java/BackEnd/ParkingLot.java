@@ -1,18 +1,21 @@
 package BackEnd;
 
 
+import GUI.Lot;
+
+import javax.swing.*;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class ParkingLot {
+public class ParkingLot implements Serializable {
     private int colSize, rowSize;
     private int totalCellCount;
     private int availableCells;
     private int roadCells;
     private int unavailableCells;
     private String parkingLotName;
-    private final ArrayList<ArrayList<Car>>grid;
-
+    private final Lot[][] grid;
     public ParkingLot(String parkingLotName, int rowSize, int colSize) {
         this.parkingLotName = parkingLotName;
         this.colSize = colSize;
@@ -21,17 +24,13 @@ public class ParkingLot {
         this.availableCells = totalCellCount;
         this.roadCells = 0;
         this.unavailableCells = 0;
-        grid = new ArrayList<>();
-        for(int i=0; i<colSize;i++) {
-            grid.add(new ArrayList<>());
-        }
+        grid = new Lot[rowSize][colSize];
     }
 
-    public ParkingLot() {
-        colSize = 0;
-        rowSize = 0;
-        grid = new ArrayList<>();
+    public void addLot(Lot lot, int x, int y){
+        grid[y][x] = lot;
     }
+
 
     public int getRowSize() {
         return rowSize;
@@ -77,26 +76,19 @@ public class ParkingLot {
         this.roadCells = roadCells;
     }
 
-    public void addRow(int row) {
-        for(int y=0; y<row;y++) {
-            grid.add(new ArrayList<>());
-        }
-    }
-
-    public void addCol(int col) {
-        for(int x=0; x<col;x++) {
-            grid.get(x).add(null);
-        }
-    }
 
     public void parkCar(Car car, int row, int col) {
-        if (grid.get(row).get(col) != null) {
+        if (grid[row][col] != null) {
             return;
         }
-        grid.get(row).add(car);
+        grid[row][col].setCar(car);
     }
 
-    public ArrayList<ArrayList<Car>> getParkingLot() {
+    public Lot getLot(int x, int y) {
+        return grid[y][x];
+    }
+
+    public Lot[][] getParkingLot() {
         return grid;
     }
 }
