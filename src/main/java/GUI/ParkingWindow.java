@@ -2,6 +2,7 @@ package GUI;
 
 
 import BackEnd.Car;
+import BackEnd.Coordinates;
 import BackEnd.ObjectSerialize;
 import BackEnd.ParkingLot;
 import net.miginfocom.swing.MigLayout;
@@ -16,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Random;
 
 enum OPT {
     CREATE,
@@ -145,9 +147,33 @@ public class ParkingWindow extends JFrame {
             RFIDRegisterInput = new JTextField();
             rfidInput.setPreferredSize(new Dimension(0, 40));
             RFIDRegisterInput.setPreferredSize(new Dimension(0,40));
-            rfidInput.addActionListener(e->{
+            rfidInput.addActionListener(e->
+                    {
+                        if(!editMode){
+                            ParkingLotPanel temp = (ParkingLotPanel) currentLotPanel;
+                            if(parkingLot.getMap().containsKey(rfidInput.getText())) {
+                                System.out.println(rfidInput.getText());
+                                int parkNumX = parkingLot.getMap().get(rfidInput.getText()).x();
+                                int parkNumY = parkingLot.getMap().get(rfidInput.getText()).y();
+                                temp.free(parkNumX,parkNumY);
+                                parkingLot.getMap().remove(rfidInput.getText());
+                            }
+                            else {
+                                while (true) {
+                                    int parkNumX = new Random().nextInt(parkingLot.getColSize());
+                                    int parkNumY = new Random().nextInt(parkingLot.getRowSize());
+                                    Lot lot = parkingLot.getLot(parkNumX, parkNumY);
+                                    lot.setState("Occupied");
+                                    if (!lot.isOccupied() && lot.isAvailable()) {
+                                        temp.occupied(new Car(rfidInput.getText()), parkNumX, parkNumY);
+                                        parkingLot.getMap().put(rfidInput.getText(), new Coordinates(parkNumX, parkNumY));
+                                        break;
+                                    }
+                                }
+                            }
 
-                        rfidInput.setText("");
+                            rfidInput.setText("");
+                        }
                     }
             );
 

@@ -1,7 +1,6 @@
 package GUI;
 
 import BackEnd.ParkingLot;
-import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;

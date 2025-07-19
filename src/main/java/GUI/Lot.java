@@ -12,11 +12,13 @@ public class Lot implements Serializable{
     private int x, y;
     private boolean isClicked;
     private boolean isOccupied;
+    private boolean isAvailable;
     private String state;
     private Car car;
     Lot(int x, int y) {
         this.isClicked = false;
         this.isOccupied = false;
+        this.isAvailable = true;
         this.x = x;
         this.y = y;
         state = "";
@@ -28,6 +30,10 @@ public class Lot implements Serializable{
         isOccupied = true;
     }
 
+    public void setAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
+
     public Car getCar() {
         return car;
     }
@@ -35,6 +41,9 @@ public class Lot implements Serializable{
     public void removeCar(Car car) {
         this.car = null;
         isOccupied = false;
+    }
+    public boolean isAvailable() {
+        return isAvailable;
     }
 
     public void setClicked(boolean isClicked) {

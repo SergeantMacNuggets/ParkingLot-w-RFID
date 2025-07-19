@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class ParkingLot implements Serializable {
     private int colSize, rowSize;
@@ -16,6 +18,7 @@ public class ParkingLot implements Serializable {
     private int unavailableCells;
     private String parkingLotName;
     private final Lot[][] grid;
+    private final HashMap<String, Coordinates> rfidCards;
     public ParkingLot(String parkingLotName, int rowSize, int colSize) {
         this.parkingLotName = parkingLotName;
         this.colSize = colSize;
@@ -24,11 +27,16 @@ public class ParkingLot implements Serializable {
         this.availableCells = totalCellCount;
         this.roadCells = 0;
         this.unavailableCells = 0;
+        rfidCards = new HashMap<>();
         grid = new Lot[rowSize][colSize];
     }
 
     public void addLot(Lot lot, int x, int y){
         grid[y][x] = lot;
+    }
+
+    public HashMap<String, Coordinates> getMap() {
+        return rfidCards;
     }
 
 
@@ -78,10 +86,10 @@ public class ParkingLot implements Serializable {
 
 
     public void parkCar(Car car, int row, int col) {
-        if (grid[row][col] != null) {
-            return;
-        }
         grid[row][col].setCar(car);
+//        if (grid[row][col] != null) {
+//            return;
+//        }
     }
 
     public Lot getLot(int x, int y) {

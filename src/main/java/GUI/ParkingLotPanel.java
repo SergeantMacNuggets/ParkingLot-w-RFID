@@ -1,5 +1,6 @@
 package GUI;
 
+import BackEnd.Car;
 import BackEnd.ParkingLot;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.awt.event.MouseListener;
 
 public class ParkingLotPanel extends JPanel {
     private ParkingLot parkingLot;
+    private LotPanel[][] gridPanel;
     private int x, y;
     private int roadCell;
     private int unavailableCell;
@@ -18,6 +20,7 @@ public class ParkingLotPanel extends JPanel {
         this.parkingLot = parkingLot;
         this.x = parkingLot.getColSize();
         this.y = parkingLot.getRowSize();
+        gridPanel = new LotPanel[y][x];
         roadCell = 0;
         unavailableCell = 0;
     }
@@ -32,11 +35,22 @@ public class ParkingLotPanel extends JPanel {
                 for (int j = 0; j < x; j++) {
                     parkingLot.addLot(new Lot(j,i), j, i);
                     LotPanel temp = new LotPanel(parkingLot.getLot(j,i));
+                    gridPanel[i][j] = temp;
                     temp.setListener(mouseListener());
                     this.add(temp);
                 }
             }
         }
+    }
+
+    public void occupied(Car car, int x, int y) {
+        parkingLot.parkCar(car, y, x);
+        gridPanel[y][x].setBackground(Color.green);
+    }
+
+    public void free(int x, int y) {
+        parkingLot.parkCar(null, x, y);
+        gridPanel[y][x].setBackground(Color.DARK_GRAY);
     }
 
     public void loadPanel() {
@@ -104,6 +118,7 @@ public class ParkingLotPanel extends JPanel {
                 instance.getTable().setValueAt(parkingLot.getUnavailableCells(), 4,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
                 lot.setState("Lot");
+                lot.setAvailable(false);
                 break;
             case 1:
                 parkingLot.setRoadCells(++roadCell);
@@ -112,6 +127,7 @@ public class ParkingLotPanel extends JPanel {
                 instance.getTable().setValueAt(parkingLot.getRoadCells(), 5,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
                 lot.setState("Road");
+                lot.setAvailable(false);
                 break;
             case 2:
                 if(lot.getGridY() == 0 || lot.getGridY() == parkingLot.getRowSize()-1 || lot.getGridX() == 0 || lot.getGridX() == parkingLot.getColSize()-1){
@@ -121,6 +137,7 @@ public class ParkingLotPanel extends JPanel {
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
                     parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
                     lot.setState("Entrance");
+                    lot.setAvailable(false);
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Entrance must be on the corner of the parking lot");
@@ -135,6 +152,7 @@ public class ParkingLotPanel extends JPanel {
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
                     parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
                     lot.setState("Exit");
+                    lot.setAvailable(false);
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Exit must be on the corner of the parking lot");
