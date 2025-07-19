@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 
-public class Lot extends JPanel {
+public class Lot implements Serializable{
     private int x, y;
     private boolean isClicked;
     private boolean isOccupied;
@@ -19,12 +19,8 @@ public class Lot extends JPanel {
         this.isOccupied = false;
         this.x = x;
         this.y = y;
-        this.setLayout(new GridBagLayout());
-        this.setBackground(Color.DARK_GRAY);
-        JLabel p = new JLabel("P");
-        p.setFont(new Font("Arial", Font.BOLD, 30));
-        p.setForeground(Color.LIGHT_GRAY);
-        this.add(p);
+        state = "";
+
     }
 
     public void setCar(Car car) {

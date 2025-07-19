@@ -30,7 +30,7 @@ public class CreateLotWindow extends JFrame {
         p.add(submit);
         this.submit.addActionListener(e->{
             this.parkingLot = new ParkingLot(lotName.getText(),Integer.parseInt(rowInput.getText()), Integer.parseInt(colInput.getText()));
-            ParkingWindow.getInstance().updateParkingLot(parkingLot);
+            ParkingWindow.getInstance().updateParkingLot(parkingLot,OPT.CREATE);
             this.setVisible(false);
             this.dispose();
         });

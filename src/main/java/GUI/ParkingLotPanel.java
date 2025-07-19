@@ -11,21 +11,45 @@ import java.awt.event.MouseListener;
 
 public class ParkingLotPanel extends JPanel {
     private ParkingLot parkingLot;
+    private int x, y;
     private int roadCell;
     private int unavailableCell;
     ParkingLotPanel(ParkingLot parkingLot) {
         this.parkingLot = parkingLot;
-        int x = parkingLot.getColSize(), y = parkingLot.getRowSize();
+        this.x = parkingLot.getColSize();
+        this.y = parkingLot.getRowSize();
         roadCell = 0;
         unavailableCell = 0;
-        if(x != 0 && y != 0){
+    }
+
+    public void createPanel() {
+        if(x == 0 || y == 0){
+            return;
+        }
+        else {
             this.setLayout(new GridLayout(y, x, 5, 5));
             for (int i = 0; i < y; i++) {
                 for (int j = 0; j < x; j++) {
-                    parkingLot.addLot(new Lot(j,i),j, i);
-                    Lot lot = parkingLot.getLot(j,i);
-                    lot.addMouseListener(mouseListener());
-                    this.add(lot);
+                    parkingLot.addLot(new Lot(j,i), j, i);
+                    LotPanel temp = new LotPanel(parkingLot.getLot(j,i));
+                    temp.setListener(mouseListener());
+                    this.add(temp);
+                }
+            }
+        }
+    }
+
+    public void loadPanel() {
+        if(x == 0 || y == 0){
+            return;
+        }
+        else {
+            this.setLayout(new GridLayout(y, x, 5, 5));
+            for (int i = 0; i < y; i++) {
+                for (int j = 0; j < x; j++) {
+                    LotPanel temp = new LotPanel(parkingLot.getLot(j,i));
+                    temp.setListener(mouseListener());
+                    this.add(temp);
                 }
             }
         }
@@ -37,9 +61,9 @@ public class ParkingLotPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 ParkingWindow instance = ParkingWindow.getInstance();
-                Lot panel = (Lot) e.getSource();
-                if (!panel.isClicked()){
-                    panel.setClicked(true);
+                LotPanel panel = (LotPanel) e.getSource();
+                if (!panel.getLot().isClicked()){
+                    panel.getLot().setClicked(true);
                     if (instance.getMode()) {
                         for (int i = 0; i < instance.getRadioButtons().length; i++) {
                             if (instance.getRadioButtons()[i].isSelected()) {
@@ -60,8 +84,8 @@ public class ParkingLotPanel extends JPanel {
                         JLabel l = new JLabel("P");
                         l.setFont(new Font("Arial", Font.BOLD, 30));
                         l.setForeground(Color.LIGHT_GRAY);
-                        lotState(panel);
-                        panel.setClicked(false);
+                        lotState(panel.getLot());
+                        panel.getLot().setClicked(false);
                         panel.add(l);
                         panel.revalidate();
                         panel.repaint();
@@ -69,8 +93,9 @@ public class ParkingLotPanel extends JPanel {
             }
         };
     }
-    private void lotState(int index, Lot p) throws Exception{
+    private void lotState(int index, LotPanel p) throws Exception{
         ParkingWindow instance = ParkingWindow.getInstance();
+        Lot lot = p.getLot();
         switch(index) {
             case 0:
                 parkingLot.setUnavailableCells(++unavailableCell);
@@ -78,7 +103,7 @@ public class ParkingLotPanel extends JPanel {
                 instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
                 instance.getTable().setValueAt(parkingLot.getUnavailableCells(), 4,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
-                p.setState("Lot");
+                lot.setState("Lot");
                 break;
             case 1:
                 parkingLot.setRoadCells(++roadCell);
@@ -86,16 +111,16 @@ public class ParkingLotPanel extends JPanel {
                 instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
                 instance.getTable().setValueAt(parkingLot.getRoadCells(), 5,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
-                p.setState("Road");
+                lot.setState("Road");
                 break;
             case 2:
-                if(p.getGridY() == 0 || p.getGridY() == parkingLot.getRowSize()-1 || p.getGridX() == 0 || p.getGridX() == parkingLot.getColSize()-1){
+                if(lot.getGridY() == 0 || lot.getGridY() == parkingLot.getRowSize()-1 || lot.getGridX() == 0 || lot.getGridX() == parkingLot.getColSize()-1){
                     parkingLot.setRoadCells(++roadCell);
                     p.setBackground(Color.orange);
                     instance.getTable().setValueAt(parkingLot.getAvailableCells() - 1, 3, 1);
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
                     parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
-                    p.setState("Entrance");
+                    lot.setState("Entrance");
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Entrance must be on the corner of the parking lot");
@@ -103,13 +128,13 @@ public class ParkingLotPanel extends JPanel {
                 }
                 break;
             case 3:
-                if(p.getGridY() == 0 || p.getGridY() == parkingLot.getRowSize()-1 || p.getGridX()==0 || p.getGridX() == parkingLot.getColSize()-1){
+                if(lot.getGridY() == 0 || lot.getGridY() == parkingLot.getRowSize()-1 || lot.getGridX()==0 || lot.getGridX() == parkingLot.getColSize()-1){
                     parkingLot.setRoadCells(++roadCell);
                     p.setBackground(Color.magenta);
                     instance.getTable().setValueAt(parkingLot.getAvailableCells() - 1, 3, 1);
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
                     parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
-                    p.setState("Exit");
+                    lot.setState("Exit");
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Exit must be on the corner of the parking lot");

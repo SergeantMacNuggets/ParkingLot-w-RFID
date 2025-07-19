@@ -17,6 +17,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
+enum OPT {
+    CREATE,
+    LOAD
+}
+
 interface LocalColor {
     Color inputColor = new Color(52,87,52);
     Color editColor = new Color(197, 28,44);
@@ -107,7 +112,10 @@ public class ParkingWindow extends JFrame {
             int returnVal = chooser.showOpenDialog(this);
             if(returnVal == JFileChooser.APPROVE_OPTION) {
                 parkingLot = ObjectSerialize.serializeDataIn(chooser.getSelectedFile().getName());
-                this.updateParkingLot(parkingLot);
+                this.updateParkingLot(parkingLot,OPT.LOAD);
+                table.setValueAt(parkingLot.getAvailableCells(), 3,1);
+                table.setValueAt(parkingLot.getUnavailableCells(), 4,1);
+                table.setValueAt(parkingLot.getRoadCells(), 5,1);
             }
         });
         newButton.addActionListener(createParkingLot());
@@ -138,8 +146,7 @@ public class ParkingWindow extends JFrame {
             rfidInput.setPreferredSize(new Dimension(0, 40));
             RFIDRegisterInput.setPreferredSize(new Dimension(0,40));
             rfidInput.addActionListener(e->{
-                        parkingLot.parkCar(new Car(rfidInput.getText()), 5,5);
-                        parkingLot.getLot(5,5).setBackground(Color.green);
+
                         rfidInput.setText("");
                     }
             );
@@ -169,9 +176,14 @@ public class ParkingWindow extends JFrame {
         return p;
     }
 
-    public void updateParkingLot(ParkingLot parkingLot) {
+    public void updateParkingLot(ParkingLot parkingLot, OPT opt) {
+        ParkingLotPanel parkingLotPanel = new ParkingLotPanel(parkingLot);
         parkingWindow.setParkingLot(parkingLot);
-        parkingWindow.panelSwitcher(new ParkingLotPanel(parkingLot));
+        parkingWindow.panelSwitcher(parkingLotPanel);
+        switch (opt) {
+            case CREATE -> parkingLotPanel.createPanel();
+            case LOAD -> parkingLotPanel.loadPanel();
+        }
         lotNameLabel.setText(parkingLot.getName());
         table.setValueAt(parkingLot.getRowSize(), 0, 1);
         table.setValueAt(parkingLot.getColSize(), 1, 1);
