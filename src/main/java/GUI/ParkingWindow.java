@@ -25,15 +25,20 @@ public class ParkingWindow extends JFrame {
     private ParkingLot parkingLot;
     private boolean editMode;
     private JPanel south;
+    private JPanel currentLotPanel;
+    private JLabel lotNameLabel;
+    private JButton newButton;
+    private JButton openButton;
     private JRadioButton editLot;
     private JRadioButton editRoad;
     private JRadioButton editExit;
     private JRadioButton editEnter;
     private JTextField rfidInput;
     private JTextField RFIDRegisterInput;
+    private JTable table;
 
     public void start() {
-        this.parkingLot = new ParkingLot(10,10);
+        this.parkingLot = new ParkingLot("",0,0);
         this.editMode = false;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1200, 800));
@@ -41,18 +46,27 @@ public class ParkingWindow extends JFrame {
         this.setTitle("Parking Lot System");
         this.setJMenuBar(new MenuBar());
         south = southPanel();
-
+        currentLotPanel = new ParkingLotPanel(parkingLot);
         this.add(northPanel(),BorderLayout.NORTH);
-        this.add(generateLot(), BorderLayout.CENTER);
+        this.add(currentLotPanel, BorderLayout.CENTER);
         this.add(leftPanel(), BorderLayout.WEST);
         this.add(rightPanel(south), BorderLayout.EAST);
         this.add(south, BorderLayout.SOUTH);
         this.pack();
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
     public void setParkingLot(ParkingLot parkingLot) {
         this.parkingLot = parkingLot;
+    }
+
+    public void panelSwitcher(JPanel p) {
+        this.remove(currentLotPanel);
+        currentLotPanel = p;
+        this.add(currentLotPanel, BorderLayout.CENTER);
+        this.revalidate();
+        this.repaint();
     }
 
 
@@ -62,20 +76,13 @@ public class ParkingWindow extends JFrame {
         }
         return parkingWindow;
     }
+    public boolean getMode() {
 
-    private JPanel generateLot() {
-        JPanel p = new JPanel();
-        int x = parkingLot.getColSize(), y = parkingLot.getRowSize();
-        if(x != 0 && y != 0){
-            p.setLayout(new GridLayout(y, x, 5, 5));
-            for (int i = 0; i < y; i++) {
-                for (int j = 0; j < x; j++) {
-                    Lot lot = new Lot();
-                    p.add(lot);
-                }
-            }
-        }
-        return p;
+        return editMode;
+    }
+
+    public JRadioButton[] getRadioButtons() {
+        return new JRadioButton[]{editLot,editRoad,editEnter,editExit};
     }
 
     private JPanel northPanel() {
@@ -83,17 +90,21 @@ public class ParkingWindow extends JFrame {
 
         JPanel left = new JPanel();
         JPanel right = new JPanel();
+        newButton = new JButton("New") {{this.setPreferredSize(new Dimension(150,50));
+                                         this.setBackground(LocalColor.buttonColor);
+                                         this.setFont(new Font("Ariel", Font.BOLD,24));}};
+
+        openButton = new JButton("Open"){{this.setPreferredSize(new Dimension(150,50));
+                                         this.setBackground(LocalColor.buttonColor);
+                                         this.setFont(new Font("Ariel", Font.BOLD,24));}};
+        newButton.addActionListener(createParkingLot());
         right.setBorder(BorderFactory.createEmptyBorder(20,0,20,40));
         p.setPreferredSize(new Dimension(0, 100));
 
 
         p.setLayout(new BorderLayout());
-        left.add(new JButton("New") {{this.setPreferredSize(new Dimension(150,70));
-                                    this.setBackground(LocalColor.buttonColor);
-                                    this.setFont(new Font("Ariel", Font.BOLD,24));}});
-        left.add(new JButton("Open"){{this.setPreferredSize(new Dimension(150,70));
-                                    this.setBackground(LocalColor.buttonColor);
-                                    this.setFont(new Font("Ariel", Font.BOLD,24));}});
+        left.add(newButton);
+        left.add(openButton);
         right.add(new JLabel("Parking Lot System") {{this.setFont(new Font("Ariel", Font.BOLD, 32));
                                                     this.setForeground(LocalColor.buttonColor);}});
         p.add(left,BorderLayout.WEST);
@@ -108,7 +119,7 @@ public class ParkingWindow extends JFrame {
 
             JPanel top = new JPanel(new MigLayout());
             JPanel bottom = new JPanel(new MigLayout());
-
+            lotNameLabel = new JLabel("") {{this.setFont(new Font("Ariel", Font.BOLD, 15));}};
             rfidInput = new JTextField();
             RFIDRegisterInput = new JTextField();
             rfidInput.setPreferredSize(new Dimension(0, 40));
@@ -126,6 +137,9 @@ public class ParkingWindow extends JFrame {
             top.add(new JLabel(),"wrap 50");
             top.add(new JLabel("Register an RFID Number: ") {{this.setFont(new Font("Ariel", Font.BOLD, 15));}}, "wrap");
             top.add(RFIDRegisterInput, "width 95%");
+            top.add(new JLabel(), "wrap 50");
+            top.add(new JLabel("Parking Lot Name: "){{this.setFont(new Font("Ariel", Font.BOLD, 15));}}, "wrap");
+            top.add(lotNameLabel);
             bottom.add(new JLabel(new ImageIcon(logo)), "gapleft 15%");
             bottom.add(new JLabel(),"wrap 50");
             bottom.add(new JLabel("Connected!") {{this.setFont(new Font("Ariel", Font.BOLD, 22));
@@ -141,8 +155,24 @@ public class ParkingWindow extends JFrame {
         return p;
     }
 
+    public void updateParkingLot(ParkingLot parkingLot) {
+        parkingWindow.setParkingLot(parkingLot);
+        parkingWindow.panelSwitcher(new ParkingLotPanel(parkingLot));
+        lotNameLabel.setText(parkingLot.getName());
+        table.setValueAt(parkingLot.getRowSize(), 0, 1);
+        table.setValueAt(parkingLot.getColSize(), 1, 1);
+        table.setValueAt(parkingLot.getRowSize() * parkingLot.getColSize(), 2, 1);
+        table.setValueAt(parkingLot.getRowSize() * parkingLot.getColSize(), 3, 1);
+        table.setValueAt(0,4,1);
+        table.setValueAt(0,5,1);
+    }
+
+    public JTable getTable() {
+        return table;
+    }
+
     private JPanel rightPanel(JPanel south) {
-        Font f = new Font("Ariel", Font.BOLD, 12);
+        ButtonGroup editRadio = new ButtonGroup();
         editLot = new JRadioButton("Lot");
         editRoad = new JRadioButton("Road");
         editEnter = new JRadioButton("Entrance");
@@ -151,25 +181,25 @@ public class ParkingWindow extends JFrame {
         editRoad.setEnabled(false);
         editEnter.setEnabled(false);
         editExit.setEnabled(false);
-        ButtonGroup editRadio = new ButtonGroup();
         editRadio.add(editEnter);
         editRadio.add(editLot);
         editRadio.add(editExit);
         editRadio.add(editRoad);
         Object[][] data = {
-                {"Row Count", parkingLot.getRowSize()},
-                {"Column Count", parkingLot.getColSize()},
-                {"Total Cell Count", parkingLot.getRowSize() * parkingLot.getColSize()},
-                {"Total Available Cell", 12},
-                {"Total Road Cell", 10}
+                {"Row Count", 0},
+                {"Column Count", 0},
+                {"Total Cell Count", 0},
+                {"Total Available Cell", 0},
+                {"Total Unavailable Cell", 0},
+                {"Total Road Cell", 0}
         };
         Object[] label = {"Label", "Count"};
-        JTable table = new JTable(data,label);
+        table = new JTable(data,label);
         table.setFont(new Font("Ariel", Font.BOLD, 12));
         JPanel p = new JPanel();
         JPanel top = new JPanel(new GridLayout(1,1));
         JPanel bottom = new JPanel(new MigLayout());
-        table.setRowHeight(50);
+        table.setRowHeight(40);
         top.add(new JScrollPane(table));
         bottom.add(new JButton("Edit") {{
             this.addActionListener(new ActionListener() {
@@ -210,6 +240,12 @@ public class ParkingWindow extends JFrame {
         p.setBackground(LocalColor.inputColor); // Green r:52 g:87 b:52   Red r:197 g:28 b:44
         p.setPreferredSize(new Dimension(0,22));
         return p;
+    }
+
+    private ActionListener createParkingLot() {
+        return _ ->{
+            new CreateLotWindow();
+        };
     }
 }
 

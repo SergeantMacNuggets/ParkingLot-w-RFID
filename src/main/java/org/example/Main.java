@@ -12,7 +12,7 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
 public class Main {
     public static void main(String[] args) {
-        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#ffa31a" ) );
+        FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#009DD1" ) );
         FlatMacDarkLaf.setup();
         SwingUtilities.invokeLater(() -> {
             ParkingWindow.getInstance().start();
