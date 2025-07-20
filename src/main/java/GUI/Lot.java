@@ -1,11 +1,6 @@
 package GUI;
 
 import BackEnd.Car;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.Serializable;
 
 public class Lot implements Serializable{
@@ -15,7 +10,7 @@ public class Lot implements Serializable{
     private boolean isAvailable;
     private String state;
     private Car car;
-    Lot(int x, int y) {
+    public Lot(int x, int y) {
         this.isClicked = false;
         this.isOccupied = false;
         this.isAvailable = true;

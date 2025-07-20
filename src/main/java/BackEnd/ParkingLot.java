@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 
 public class ParkingLot implements Serializable {
@@ -16,9 +17,11 @@ public class ParkingLot implements Serializable {
     private int availableCells;
     private int roadCells;
     private int unavailableCells;
+    private int parkedCarsCells;
     private String parkingLotName;
     private final Lot[][] grid;
     private final HashMap<String, Coordinates> rfidCards;
+    private final LinkedList<String> registerCards;
     public ParkingLot(String parkingLotName, int rowSize, int colSize) {
         this.parkingLotName = parkingLotName;
         this.colSize = colSize;
@@ -27,7 +30,9 @@ public class ParkingLot implements Serializable {
         this.availableCells = totalCellCount;
         this.roadCells = 0;
         this.unavailableCells = 0;
+        this.parkedCarsCells = 0;
         rfidCards = new HashMap<>();
+        registerCards = new LinkedList<>();
         grid = new Lot[rowSize][colSize];
     }
 
@@ -68,6 +73,26 @@ public class ParkingLot implements Serializable {
         return unavailableCells;
     }
 
+    public int getParkedCarsCells() {
+        return parkedCarsCells;
+    }
+
+    public void register(String id) {
+        registerCards.add(id);
+    }
+
+    public boolean authorize(String id) {
+        return registerCards.contains(id);
+    }
+
+    public void setParkedCarsCells(int parkedCarsCells) {
+        this.parkedCarsCells = parkedCarsCells;
+    }
+
+    public void removeCard(String id) {
+        registerCards.remove(id);
+    }
+
     public void setTotalCellCount(int totalCellCount) {
         this.totalCellCount = totalCellCount;
     }
@@ -87,9 +112,10 @@ public class ParkingLot implements Serializable {
 
     public void parkCar(Car car, int row, int col) {
         grid[row][col].setCar(car);
-//        if (grid[row][col] != null) {
-//            return;
-//        }
+    }
+
+    public void free(int x, int y) {
+        grid[y][x] = new Lot(x,y);
     }
 
     public Lot getLot(int x, int y) {

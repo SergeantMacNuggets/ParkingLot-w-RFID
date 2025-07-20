@@ -16,6 +16,7 @@ public class ParkingLotPanel extends JPanel {
     private int x, y;
     private int roadCell;
     private int unavailableCell;
+    private int parkCarCell;
     ParkingLotPanel(ParkingLot parkingLot) {
         this.parkingLot = parkingLot;
         this.x = parkingLot.getColSize();
@@ -23,6 +24,7 @@ public class ParkingLotPanel extends JPanel {
         gridPanel = new LotPanel[y][x];
         roadCell = 0;
         unavailableCell = 0;
+        parkCarCell = 0;
     }
 
     public void createPanel() {
@@ -43,16 +45,6 @@ public class ParkingLotPanel extends JPanel {
         }
     }
 
-    public void occupied(Car car, int x, int y) {
-        parkingLot.parkCar(car, y, x);
-        gridPanel[y][x].setBackground(Color.green);
-    }
-
-    public void free(int x, int y) {
-        parkingLot.parkCar(null, x, y);
-        gridPanel[y][x].setBackground(Color.DARK_GRAY);
-    }
-
     public void loadPanel() {
         if(x == 0 || y == 0){
             return;
@@ -62,11 +54,31 @@ public class ParkingLotPanel extends JPanel {
             for (int i = 0; i < y; i++) {
                 for (int j = 0; j < x; j++) {
                     LotPanel temp = new LotPanel(parkingLot.getLot(j,i));
+                    gridPanel[i][j] = temp;
                     temp.setListener(mouseListener());
                     this.add(temp);
                 }
             }
         }
+    }
+
+    public void occupied(Car car, int x, int y) {
+        ParkingWindow instance = ParkingWindow.getInstance();
+        parkingLot.parkCar(car, y, x);
+        parkingLot.setParkedCarsCells(++parkCarCell);
+        gridPanel[y][x].setBackground(Color.green);
+        instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
+        instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
+
+    }
+
+    public void free(int x, int y) {
+        ParkingWindow instance = ParkingWindow.getInstance();
+        parkingLot.parkCar(null, x, y);
+        gridPanel[y][x].setBackground(Color.DARK_GRAY);
+        parkingLot.setParkedCarsCells(--parkCarCell);
+        instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
+        instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
     }
 
 

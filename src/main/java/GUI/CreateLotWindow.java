@@ -40,4 +40,5 @@ public class CreateLotWindow extends JFrame {
         this.setVisible(true);
     }
 
+
 }

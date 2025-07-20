@@ -28,15 +28,22 @@ public class LotPanel extends JPanel {
     }
 
     private void changeState(Color c) {
-        p.setText("");
+        if(c!=Color.GREEN){
+            p.setText("");
+        }
         this.removeAll();
         this.revalidate();
         this.repaint();
         this.setBackground(c);
     }
 
+
+
     public void lotState(Lot lot) {
         switch (lot.getState()) {
+            case "Occupied":
+                changeState(Color.GREEN);
+                break;
             case "Lot":
                 changeState(Color.RED);
                 break;

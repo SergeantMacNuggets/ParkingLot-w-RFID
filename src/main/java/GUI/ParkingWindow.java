@@ -35,7 +35,7 @@ public class ParkingWindow extends JFrame {
     private ParkingLot parkingLot;
     private boolean editMode;
     private JPanel south;
-    private JPanel currentLotPanel;
+    private ParkingLotPanel currentLotPanel;
     private JLabel lotNameLabel;
     private JButton newButton;
     private JButton openButton;
@@ -44,7 +44,7 @@ public class ParkingWindow extends JFrame {
     private JRadioButton editExit;
     private JRadioButton editEnter;
     private JTextField rfidInput;
-    private JTextField RFIDRegisterInput;
+    private JTextField rfidRegisterInput;
     private JTable table;
 
     public void start() {
@@ -71,12 +71,16 @@ public class ParkingWindow extends JFrame {
         this.parkingLot = parkingLot;
     }
 
-    public void panelSwitcher(JPanel p) {
-        this.remove(currentLotPanel);
-        currentLotPanel = p;
-        this.add(currentLotPanel, BorderLayout.CENTER);
-        this.revalidate();
-        this.repaint();
+    public void panelSwitcher(ParkingLotPanel p) {
+        try {
+            this.remove(currentLotPanel);
+            this.revalidate();
+            this.repaint();
+            currentLotPanel = p;
+            this.add(currentLotPanel, BorderLayout.CENTER);
+        } catch (NullPointerException e) {
+            System.out.println("Reach");
+        }
     }
 
 
@@ -144,38 +148,60 @@ public class ParkingWindow extends JFrame {
             JPanel bottom = new JPanel(new MigLayout());
             lotNameLabel = new JLabel("") {{this.setFont(new Font("Ariel", Font.BOLD, 15));}};
             rfidInput = new JTextField();
-            RFIDRegisterInput = new JTextField();
+            rfidRegisterInput = new JTextField();
             rfidInput.setPreferredSize(new Dimension(0, 40));
-            RFIDRegisterInput.setPreferredSize(new Dimension(0,40));
+            rfidRegisterInput.setPreferredSize(new Dimension(0,40));
             rfidInput.addActionListener(e->
                     {
                         if(!editMode){
-                            ParkingLotPanel temp = (ParkingLotPanel) currentLotPanel;
+                            ParkingLotPanel temp = currentLotPanel;
                             if(parkingLot.getMap().containsKey(rfidInput.getText())) {
-                                System.out.println(rfidInput.getText());
                                 int parkNumX = parkingLot.getMap().get(rfidInput.getText()).x();
                                 int parkNumY = parkingLot.getMap().get(rfidInput.getText()).y();
                                 temp.free(parkNumX,parkNumY);
+                                parkingLot.free(parkNumX, parkNumY);
                                 parkingLot.getMap().remove(rfidInput.getText());
                             }
                             else {
-                                while (true) {
-                                    int parkNumX = new Random().nextInt(parkingLot.getColSize());
-                                    int parkNumY = new Random().nextInt(parkingLot.getRowSize());
-                                    Lot lot = parkingLot.getLot(parkNumX, parkNumY);
-                                    lot.setState("Occupied");
-                                    if (!lot.isOccupied() && lot.isAvailable()) {
-                                        temp.occupied(new Car(rfidInput.getText()), parkNumX, parkNumY);
-                                        parkingLot.getMap().put(rfidInput.getText(), new Coordinates(parkNumX, parkNumY));
-                                        break;
+                                if(parkingLot.authorize(rfidInput.getText())){
+                                    while (true) {
+                                        int parkNumX = new Random().nextInt(parkingLot.getColSize());
+                                        int parkNumY = new Random().nextInt(parkingLot.getRowSize());
+                                        Lot lot = parkingLot.getLot(parkNumX, parkNumY);
+                                        lot.setState("Occupied");
+                                        if (!lot.isOccupied() && lot.isAvailable()) {
+                                            temp.occupied(new Car(rfidInput.getText()), parkNumX, parkNumY);
+                                            parkingLot.getMap().put(rfidInput.getText(), new Coordinates(parkNumX, parkNumY));
+                                            break;
+                                        }
                                     }
                                 }
                             }
-
                             rfidInput.setText("");
                         }
                     }
             );
+
+            rfidRegisterInput.addActionListener(e->{
+                String input = rfidRegisterInput.getText();
+                if(parkingLot.authorize(input)) {
+
+                    int opt = JOptionPane.showConfirmDialog(this, "ID Number: " + input + " already exist would you like to delete it?","Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if(opt == JOptionPane.YES_OPTION) {
+                        ParkingLotPanel temp = currentLotPanel;
+                        int parkNumX = parkingLot.getMap().get(input).x();
+                        int parkNumY = parkingLot.getMap().get(input).y();
+                        parkingLot.free(parkNumX, parkNumY);
+                        temp.free(parkNumX,parkNumY);
+                        parkingLot.removeCard(input);
+                        parkingLot.getMap().remove(input);
+                    }
+                }
+                else {
+                    parkingLot.register(input);
+                }
+                rfidRegisterInput.setText("");
+            });
 
             p.setPreferredSize(new Dimension(200,0));
 
@@ -183,7 +209,7 @@ public class ParkingWindow extends JFrame {
             top.add(rfidInput, "width 95%");
             top.add(new JLabel(),"wrap 50");
             top.add(new JLabel("Register an RFID Number: ") {{this.setFont(new Font("Ariel", Font.BOLD, 15));}}, "wrap");
-            top.add(RFIDRegisterInput, "width 95%");
+            top.add(rfidRegisterInput, "width 95%");
             top.add(new JLabel(), "wrap 50");
             top.add(new JLabel("Parking Lot Name: "){{this.setFont(new Font("Ariel", Font.BOLD, 15));}}, "wrap");
             top.add(lotNameLabel);
@@ -217,6 +243,7 @@ public class ParkingWindow extends JFrame {
         table.setValueAt(parkingLot.getRowSize() * parkingLot.getColSize(), 3, 1);
         table.setValueAt(0,4,1);
         table.setValueAt(0,5,1);
+        table.setValueAt(0,6,1);
     }
 
     public JTable getTable() {
@@ -243,7 +270,8 @@ public class ParkingWindow extends JFrame {
                 {"Total Cell Count", 0},
                 {"Total Available Cell", 0},
                 {"Total Unavailable Cell", 0},
-                {"Total Road Cell", 0}
+                {"Total Road Cell", 0},
+                {"Total Parked Cars", 0}
         };
         Object[] label = {"Label", "Count"};
         table = new JTable(data,label);
