@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ParkingLotRFID:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ParkingLotRFID_jar</output-path>
+    <root id="archive" name="ParkingLotRFID.jar">
+      <element id="module-output" name="ParkingLotRFID" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/formdev/flatlaf/3.6/flatlaf-3.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/miglayout/miglayout/3.7.4/miglayout-3.7.4.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Maven: com.miglayout:miglayout:3.7.4" />
+      <element id="library" level="project" name="Maven: com.formdev:flatlaf:3.6" />
+    </root>
+  </artifact>
+</component>

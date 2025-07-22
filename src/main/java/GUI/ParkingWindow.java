@@ -195,12 +195,16 @@ public class ParkingWindow extends JFrame {
                     int opt = JOptionPane.showConfirmDialog(this, "ID Number: " + input + " already exist would you like to delete it?","Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if(opt == JOptionPane.YES_OPTION) {
                         ParkingLotPanel temp = currentLotPanel;
-                        int parkNumX = parkingLot.getMap().get(input).x();
-                        int parkNumY = parkingLot.getMap().get(input).y();
-                        parkingLot.free(parkNumX, parkNumY);
-                        temp.free(parkNumX,parkNumY);
                         parkingLot.removeCard(input);
-                        parkingLot.getMap().remove(input);
+                        try {
+                            int parkNumX = parkingLot.getMap().get(input).x();
+                            int parkNumY = parkingLot.getMap().get(input).y();
+                            parkingLot.free(parkNumX, parkNumY);
+                            temp.free(parkNumX, parkNumY);
+                            parkingLot.getMap().remove(input);
+                        } catch(NullPointerException x) {
+                            x.printStackTrace();
+                        }
                     }
                 }
                 else {
