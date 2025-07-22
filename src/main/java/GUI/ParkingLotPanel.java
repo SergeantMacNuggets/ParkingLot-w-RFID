@@ -66,12 +66,14 @@ public class ParkingLotPanel extends JPanel {
 
     public void occupied(Car car, int x, int y) {
         ParkingWindow instance = ParkingWindow.getInstance();
-        parkingLot.parkCar(car, y, x);
-        parkingLot.setParkedCarsCells(++parkCarCell);
-        parkingLot.setAvailableCells(--availableCell);
-        gridPanel[y][x].setBackground(Color.green);
-        instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
-        instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
+        if(parkingLot.getLot(x,y).isAvailable()){
+            parkingLot.parkCar(car, y, x);
+            parkingLot.setParkedCarsCells(++parkCarCell);
+            parkingLot.setAvailableCells(--availableCell);
+            gridPanel[y][x].setBackground(Color.green);
+            instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3, 1);
+            instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6, 1);
+        }
 
     }
 

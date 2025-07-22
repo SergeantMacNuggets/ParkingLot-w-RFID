@@ -36,6 +36,7 @@ public class Lot implements Serializable{
     public void removeCar(Car car) {
         this.car = null;
         isOccupied = false;
+
     }
     public boolean isAvailable() {
         return isAvailable;
