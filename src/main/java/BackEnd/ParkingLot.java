@@ -112,6 +112,7 @@ public class ParkingLot implements Serializable {
 
     public void parkCar(Car car, int row, int col) {
         grid[row][col].setCar(car);
+        grid[row][col].setAvailable(false);
     }
 
     public void free(int x, int y) {

@@ -6,13 +6,11 @@ import java.io.Serializable;
 public class Lot implements Serializable{
     private int x, y;
     private boolean isClicked;
-    private boolean isOccupied;
     private boolean isAvailable;
     private String state;
     private Car car;
     public Lot(int x, int y) {
         this.isClicked = false;
-        this.isOccupied = false;
         this.isAvailable = true;
         this.x = x;
         this.y = y;
@@ -22,7 +20,6 @@ public class Lot implements Serializable{
 
     public void setCar(Car car) {
         this.car = car;
-        isOccupied = true;
     }
 
     public void setAvailable(boolean isAvailable) {
@@ -35,7 +32,6 @@ public class Lot implements Serializable{
 
     public void removeCar(Car car) {
         this.car = null;
-        isOccupied = false;
     }
     public boolean isAvailable() {
         return isAvailable;
@@ -47,10 +43,6 @@ public class Lot implements Serializable{
 
     public boolean isClicked() {
         return isClicked;
-    }
-
-    public boolean isOccupied(){
-        return isOccupied;
     }
 
     public int getGridX() {

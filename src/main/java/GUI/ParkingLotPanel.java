@@ -70,6 +70,7 @@ public class ParkingLotPanel extends JPanel {
         parkingLot.setParkedCarsCells(++parkCarCell);
         parkingLot.setAvailableCells(--availableCell);
         gridPanel[y][x].setBackground(Color.green);
+        parkingLot.getLot(x,y).setAvailable(false);
         instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
         instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
 
@@ -79,6 +80,7 @@ public class ParkingLotPanel extends JPanel {
         ParkingWindow instance = ParkingWindow.getInstance();
         parkingLot.parkCar(null, y, x);
         parkingLot.getLot(x, y).setState("");
+        parkingLot.getLot(x, y).setAvailable(true);
         gridPanel[y][x].setBackground(Color.DARK_GRAY);
         parkingLot.setParkedCarsCells(--parkCarCell);
         parkingLot.setAvailableCells(++availableCell);
@@ -93,16 +95,18 @@ public class ParkingLotPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 ParkingWindow instance = ParkingWindow.getInstance();
                 LotPanel panel = (LotPanel) e.getSource();
-                if (!panel.getLot().isClicked()){
+                if (!panel.getLot().isClicked() && !SwingUtilities.isRightMouseButton(e)){
                     panel.getLot().setClicked(true);
                     if (instance.getMode()) {
                         for (int i = 0; i < instance.getRadioButtons().length; i++) {
                             if (instance.getRadioButtons()[i].isSelected()) {
                                 try {
-                                    panel.removeAll();
-                                    panel.revalidate();
-                                    panel.repaint();
-                                    lotState(i, panel);
+                                    if(panel.getLot().isAvailable()) {
+                                        panel.removeAll();
+                                        panel.revalidate();
+                                        panel.repaint();
+                                        lotState(i, panel);
+                                    }
                                 } catch (Exception x) {
                                     break;
                                 }
@@ -111,12 +115,16 @@ public class ParkingLotPanel extends JPanel {
                     }
                 }
                 else if(instance.getMode() && SwingUtilities.isRightMouseButton(e)) {
+                    if(!panel.getLot().isAvailable() && !panel.getLot().getState().equals("Occupied")) {
                         panel.setBackground(Color.DARK_GRAY);
                         lotState(panel.getLot());
+                        panel.getLot().setState("");
                         panel.getLot().setClicked(false);
+                        panel.getLot().setAvailable(true);
                         panel.add(panel.getParkLabel());
                         panel.revalidate();
                         panel.repaint();
+                    }
                 }
             }
         };

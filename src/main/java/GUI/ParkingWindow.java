@@ -173,7 +173,7 @@ public class ParkingWindow extends JFrame {
                                         int parkNumY = new Random().nextInt(parkingLot.getRowSize());
                                         Lot lot = parkingLot.getLot(parkNumX, parkNumY);
                                         lot.setState("Occupied");
-                                        if (!lot.isOccupied() && lot.isAvailable()) {
+                                        if (lot.isAvailable()) {
                                             temp.occupied(new Car(rfidInput.getText()), parkNumX, parkNumY);
                                             parkingLot.getMap().put(rfidInput.getText(), new Coordinates(parkNumX, parkNumY));
                                             break;
