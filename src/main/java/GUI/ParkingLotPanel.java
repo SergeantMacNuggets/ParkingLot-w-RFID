@@ -15,6 +15,7 @@ public class ParkingLotPanel extends JPanel {
     private LotPanel[][] gridPanel;
     private int x, y;
     private int roadCell;
+    private int availableCell;
     private int unavailableCell;
     private int parkCarCell;
     ParkingLotPanel(ParkingLot parkingLot) {
@@ -24,6 +25,7 @@ public class ParkingLotPanel extends JPanel {
         gridPanel = new LotPanel[y][x];
         roadCell = 0;
         unavailableCell = 0;
+        availableCell = parkingLot.getAvailableCells();
         parkCarCell = 0;
     }
 
@@ -66,17 +68,20 @@ public class ParkingLotPanel extends JPanel {
         ParkingWindow instance = ParkingWindow.getInstance();
         parkingLot.parkCar(car, y, x);
         parkingLot.setParkedCarsCells(++parkCarCell);
+        parkingLot.setAvailableCells(--availableCell);
         gridPanel[y][x].setBackground(Color.green);
-        instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
+        instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
         instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
 
     }
 
     public void free(int x, int y) {
         ParkingWindow instance = ParkingWindow.getInstance();
-        parkingLot.parkCar(null, x, y);
+        parkingLot.parkCar(null, y, x);
+        parkingLot.getLot(x, y).setState("");
         gridPanel[y][x].setBackground(Color.DARK_GRAY);
         parkingLot.setParkedCarsCells(--parkCarCell);
+        parkingLot.setAvailableCells(++availableCell);
         instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
         instance.getTable().setValueAt(parkingLot.getParkedCarsCells(), 6,1);
     }
@@ -125,49 +130,67 @@ public class ParkingLotPanel extends JPanel {
         switch(index) {
             case 0:
                 parkingLot.setUnavailableCells(++unavailableCell);
+                parkingLot.setAvailableCells(--availableCell);
                 p.setBackground(Color.red);
-                instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
+                instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
                 instance.getTable().setValueAt(parkingLot.getUnavailableCells(), 4,1);
-                parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
                 lot.setState("Lot");
                 lot.setAvailable(false);
                 break;
             case 1:
                 parkingLot.setRoadCells(++roadCell);
+                parkingLot.setAvailableCells(--availableCell);
                 p.setBackground(Color.black);
-                instance.getTable().setValueAt(parkingLot.getAvailableCells()-1, 3,1);
+                instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
                 instance.getTable().setValueAt(parkingLot.getRoadCells(), 5,1);
-                parkingLot.setAvailableCells(parkingLot.getAvailableCells()-1);
                 lot.setState("Road");
                 lot.setAvailable(false);
                 break;
             case 2:
                 if(lot.getGridY() == 0 || lot.getGridY() == parkingLot.getRowSize()-1 || lot.getGridX() == 0 || lot.getGridX() == parkingLot.getColSize()-1){
                     parkingLot.setRoadCells(++roadCell);
+                    parkingLot.setAvailableCells(--availableCell);
                     p.setBackground(Color.orange);
-                    instance.getTable().setValueAt(parkingLot.getAvailableCells() - 1, 3, 1);
+                    instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3, 1);
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
-                    parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
                     lot.setState("Entrance");
                     lot.setAvailable(false);
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Entrance must be on the corner of the parking lot");
+                    p.setBackground(Color.DARK_GRAY);
+                    JLabel l = new JLabel("P");
+                    l.setFont(new Font("Arial", Font.BOLD, 30));
+                    l.setForeground(Color.LIGHT_GRAY);
+                    lotState(p.getLot());
+                    p.getLot().setClicked(false);
+                    p.add(l);
+                    p.revalidate();
+                    p.repaint();
                     throw new Exception();
                 }
                 break;
             case 3:
                 if(lot.getGridY() == 0 || lot.getGridY() == parkingLot.getRowSize()-1 || lot.getGridX()==0 || lot.getGridX() == parkingLot.getColSize()-1){
                     parkingLot.setRoadCells(++roadCell);
+                    parkingLot.setAvailableCells(--availableCell);
                     p.setBackground(Color.magenta);
-                    instance.getTable().setValueAt(parkingLot.getAvailableCells() - 1, 3, 1);
+                    instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3, 1);
                     instance.getTable().setValueAt(parkingLot.getRoadCells(), 5, 1);
-                    parkingLot.setAvailableCells(parkingLot.getAvailableCells() - 1);
                     lot.setState("Exit");
                     lot.setAvailable(false);
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Exit must be on the corner of the parking lot");
+                    p.setBackground(Color.DARK_GRAY);
+                    JLabel l = new JLabel("P");
+                    l.setFont(new Font("Arial", Font.BOLD, 30));
+                    l.setForeground(Color.LIGHT_GRAY);
+                    lotState(p.getLot());
+                    p.getLot().setClicked(false);
+                    p.add(l);
+                    p.revalidate();
+                    p.repaint();
                     throw new Exception();
                 }
                 break;
@@ -180,13 +203,15 @@ public class ParkingLotPanel extends JPanel {
         switch(p.getState()) {
             case "Lot":
                 parkingLot.setUnavailableCells(--unavailableCell);
-                instance.getTable().setValueAt(parkingLot.getAvailableCells()+1, 3,1);
+                parkingLot.setAvailableCells(++availableCell);
+                instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
                 instance.getTable().setValueAt(parkingLot.getUnavailableCells(), 4,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells()+1);
                 break;
             case "Road", "Entrance", "Exit":
                 parkingLot.setRoadCells(--roadCell);
-                instance.getTable().setValueAt(parkingLot.getAvailableCells() + 1, 3,1);
+                parkingLot.setAvailableCells(++availableCell);
+                instance.getTable().setValueAt(parkingLot.getAvailableCells(), 3,1);
                 instance.getTable().setValueAt(parkingLot.getRoadCells(), 5,1);
                 parkingLot.setAvailableCells(parkingLot.getAvailableCells() + 1);
                 break;

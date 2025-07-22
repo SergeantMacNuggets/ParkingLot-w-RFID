@@ -165,6 +165,10 @@ public class ParkingWindow extends JFrame {
                             else {
                                 if(parkingLot.authorize(rfidInput.getText())){
                                     while (true) {
+                                        if(parkingLot.getAvailableCells() <= 0) {
+                                            JOptionPane.showMessageDialog(null, "Parking Lot is Fully Occupied");
+                                            break;
+                                        }
                                         int parkNumX = new Random().nextInt(parkingLot.getColSize());
                                         int parkNumY = new Random().nextInt(parkingLot.getRowSize());
                                         Lot lot = parkingLot.getLot(parkNumX, parkNumY);
@@ -175,7 +179,9 @@ public class ParkingWindow extends JFrame {
                                             break;
                                         }
                                     }
+                                 
                                 }
+                                
                             }
                             rfidInput.setText("");
                         }
