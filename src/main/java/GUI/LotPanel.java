@@ -12,9 +12,7 @@ public class LotPanel extends JPanel {
         this.lot = lot;
         this.setLayout(new GridBagLayout());
         this.setBackground(Color.DARK_GRAY);
-        p = new JLabel("P");
-        p.setFont(new Font("Arial", Font.BOLD, 30));
-        p.setForeground(Color.LIGHT_GRAY);
+        p = getParkLabel();
         lotState(lot);
         this.add(p);
     }
@@ -37,6 +35,12 @@ public class LotPanel extends JPanel {
         this.setBackground(c);
     }
 
+    public JLabel getParkLabel() {
+        p = new JLabel(lot.getGridY()+"P"+lot.getGridX());
+        p.setFont(new Font("Arial", Font.BOLD, 22));
+        p.setForeground(Color.LIGHT_GRAY);
+        return p;
+    }
 
 
     public void lotState(Lot lot) {

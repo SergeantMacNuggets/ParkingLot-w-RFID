@@ -112,12 +112,9 @@ public class ParkingLotPanel extends JPanel {
                 }
                 else if(instance.getMode() && SwingUtilities.isRightMouseButton(e)) {
                         panel.setBackground(Color.DARK_GRAY);
-                        JLabel l = new JLabel("P");
-                        l.setFont(new Font("Arial", Font.BOLD, 30));
-                        l.setForeground(Color.LIGHT_GRAY);
                         lotState(panel.getLot());
                         panel.getLot().setClicked(false);
-                        panel.add(l);
+                        panel.add(panel.getParkLabel());
                         panel.revalidate();
                         panel.repaint();
                 }
@@ -159,12 +156,9 @@ public class ParkingLotPanel extends JPanel {
                 else {
                     JOptionPane.showMessageDialog(null, "Entrance must be on the corner of the parking lot");
                     p.setBackground(Color.DARK_GRAY);
-                    JLabel l = new JLabel("P");
-                    l.setFont(new Font("Arial", Font.BOLD, 30));
-                    l.setForeground(Color.LIGHT_GRAY);
                     lotState(p.getLot());
                     p.getLot().setClicked(false);
-                    p.add(l);
+                    p.add(p.getParkLabel());
                     p.revalidate();
                     p.repaint();
                     throw new Exception();
@@ -183,12 +177,9 @@ public class ParkingLotPanel extends JPanel {
                 else {
                     JOptionPane.showMessageDialog(null, "Exit must be on the corner of the parking lot");
                     p.setBackground(Color.DARK_GRAY);
-                    JLabel l = new JLabel("P");
-                    l.setFont(new Font("Arial", Font.BOLD, 30));
-                    l.setForeground(Color.LIGHT_GRAY);
                     lotState(p.getLot());
                     p.getLot().setClicked(false);
-                    p.add(l);
+                    p.add(p.getParkLabel());
                     p.revalidate();
                     p.repaint();
                     throw new Exception();
